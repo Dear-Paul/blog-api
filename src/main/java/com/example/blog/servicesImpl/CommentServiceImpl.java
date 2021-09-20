@@ -52,12 +52,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comments updateComment(long postId, CommentRequest commentRequest, long userId) {
-        return null;
+    public Comments updateComment(Comments comments) {
+        return commentsRepository.save(comments);
+
     }
 
     @Override
-    public ApiResponse deleteComment(long postId, long id, long userId) {
-        return null;
+    public void deleteComment(long id) {
+        commentsRepository.deleteById(id);
+    }
+
+    @Override
+    public Comments findCommentById(long id) {
+        return commentsRepository.getById(id);
     }
 }

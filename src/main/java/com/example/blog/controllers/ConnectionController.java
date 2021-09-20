@@ -7,6 +7,7 @@ import com.example.blog.payload.ApiResponse;
 import com.example.blog.services.ConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,5 +34,11 @@ public class ConnectionController {
         } else {
             return new ApiResponse("There is no post avialable", HttpStatus.NO_CONTENT);
         }
+    }
+
+    @GetMapping("/connections/{id}")
+    public ResponseEntity<List<Connection>> displayAllUserConnection(@PathVariable(name = "id") long userId){
+        List<Connection> userConnections = connectionService.displayUserConnection(userId);
+        return new ResponseEntity<>(userConnections, HttpStatus.ACCEPTED);
     }
 }

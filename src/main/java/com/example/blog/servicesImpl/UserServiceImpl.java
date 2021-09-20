@@ -2,11 +2,11 @@ package com.example.blog.servicesImpl;
 
 import com.example.blog.enums.AccountStatus;
 import com.example.blog.enums.UserType;
+import com.example.blog.exceptions.BlogApiException;
 import com.example.blog.models.Users;
 import com.example.blog.repositories.UserRepository;
 import com.example.blog.services.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 @Service
 @Component
@@ -29,7 +28,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public Optional<Users> findByUserName(String userName) {
+    public Users findByUserName(String userName) {
+
         return userRepository.findByUserName(userName);
     }
 
@@ -45,13 +45,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Users saveUser(Users users) {
-        users.setUserType(UserType.USERS);
-        users.setAccountStatus(AccountStatus.ACTIVE);
-        return userRepository.save(users);
+        if(users.getEmail() == null){
+            throw new BlogApiException("The email has been used by another user");
+        } else {
+            users.setUserType(UserType.USERS);
+            users.setAccountStatus(AccountStatus.ACTIVE);
+            return userRepository.save(users);
+        }
     }
 
     @Override
-    public List<Users> getAllUsers() {
+    public List<Users> getAllUsers(long userId) {
         return userRepository.findAll();
     }
 
@@ -59,22 +63,25 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(long userId) throws InterruptedException {
         Users user = userRepository.getById(userId);
         user.setAccountStatus(AccountStatus.DELETED);
-        removeUserBySchedule();
-
-       // restoreUserAccount(userId);
-        if(user.getAccountStatus().equals(AccountStatus.DELETED)){
-            userRepository.delete(user);
-        } else {
-            userRepository.save(user);
+//        removeUserBySchedule();
+//
+//       // restoreUserAccount(userId);
+//        if(user.getAccountStatus().equals(AccountStatus.DELETED)){
+//            userRepository.delete(user);
+//        } else {
+//          restoreUserAccount(userId);
+        userRepository.save(user);
         }
 
-    }
-    @Scheduled(fixedDelay = 100000)
+
+    @Scheduled(fixedDelay = 150000)
     @Override
     public void removeUserBySchedule() throws InterruptedException {
 
-        log.info("I am waiting for 1min before executing");
+       log.info("I am waiting for 1min before executing");
         TimeUnit.MINUTES.sleep(1);
+        List<Users> users = userRepository.findByAccountStatus(AccountStatus.DELETED);
+        userRepository.deleteAll(users);
 
 
     }
@@ -82,7 +89,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public Users restoreUserAccount(long userId) {
         Users user = userRepository.getById(userId);
-        user.setAccountStatus(AccountStatus.ACTIVE);
+        if(user.getAccountStatus().equals(AccountStatus.DELETED)) {
+            user.setAccountStatus(AccountStatus.ACTIVE);
+            userRepository.save(user);
+        }
+        return user;
+    }
+
+    @Override
+    public Users updateUser(Users user) {
         return userRepository.save(user);
+    }
+
+    @Override
+    public Optional<Users> findUserById(long userId) {
+        return userRepository.findById(userId);
     }
 }

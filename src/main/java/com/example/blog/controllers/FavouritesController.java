@@ -28,8 +28,8 @@ public class FavouritesController {
     private FavouritesServices favouritesServices;
 
 
-    @GetMapping("/getFavPosts/{favId}")
-    public ResponseEntity<List<Favourites>> getAllFavPost(@PathVariable(name = "favId") long favId){
+    @GetMapping("/getFavPosts/{userId}")
+    public ResponseEntity<List<Favourites>> getAllFavPost(@PathVariable(name = "userId") long favId){
         List<Favourites> favPosts = favouritesServices.getAllFavoritesById(favId);
         return new ResponseEntity<>(favPosts, HttpStatus.OK);
     }
@@ -42,8 +42,8 @@ public class FavouritesController {
     }
 
     @PostMapping("/removeFromFav/{id}/del/{postId}")
-    public ApiResponse removeFromFavourites(@PathVariable(name = "id") long favId, @PathVariable(name = "postId") long postId){
-        favouritesServices.removeFromFavourites(favId, postId);
+    public ApiResponse removeFromFavourites(@PathVariable(name = "id") long userId, @PathVariable(name = "postId") long postId){
+        favouritesServices.removeFromFavourites(userId, postId);
         return new ApiResponse(Boolean.TRUE, "Posts successfully removed from favourites");
     }
 }

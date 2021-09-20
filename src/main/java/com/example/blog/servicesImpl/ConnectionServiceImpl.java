@@ -47,7 +47,7 @@ public class ConnectionServiceImpl implements ConnectionService {
 
 //            List<Users> listOfConnections = connection.get().getUsers();
 //            listOfConnections.add(users);
-          throw new BlogApiException("This user has been connected to this user");
+          throw new BlogApiException("The users are connected already");
 
 
         }
@@ -69,4 +69,13 @@ public class ConnectionServiceImpl implements ConnectionService {
         }
         return listOfPosts;
     }
+
+    @Override
+    public List<Connection> displayUserConnection(long userId) {
+        Users user = userRepository.getById(userId);
+
+        return connectionRepository.findConnectionsByUser(user);
+    }
+
+
 }

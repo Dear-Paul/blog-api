@@ -15,5 +15,7 @@ public interface FavouritesRepository extends JpaRepository<Favourites, Long> {
 //    Favourites getFavouritesByUsers_Id(long userId);
     Optional<Favourites> findByUsers(Users users);
     Favourites findAllById(long favId);
+    List<Favourites> getFavouritesByUsers_Id(long id);
+    Optional<Favourites> findFavouritesByUsers(Users userId);
 
 }

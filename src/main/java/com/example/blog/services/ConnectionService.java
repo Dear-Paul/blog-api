@@ -9,4 +9,5 @@ import java.util.List;
 public interface ConnectionService {
     Connection addUserToConnections(long userId, long id);
     List<Posts> displayPostsByConnection(long userId);
+    List<Connection> displayUserConnection(long userId);
 }

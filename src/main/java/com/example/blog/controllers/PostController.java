@@ -3,10 +3,12 @@ package com.example.blog.controllers;
 import com.example.blog.models.Comments;
 import com.example.blog.dto.PostDto;
 import com.example.blog.models.Posts;
+import com.example.blog.models.Users;
 import com.example.blog.payload.ApiResponse;
 import com.example.blog.payload.CommentRequest;
 import com.example.blog.services.CommentService;
 import com.example.blog.services.PostService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +42,12 @@ public class PostController {
         }
 
     @PostMapping("/save/{userId}")
-    public ResponseEntity<Posts> savePost(@RequestBody PostDto postDto, @PathVariable(name = "userId") long id ){
+    @ApiOperation(
+            value = "Users posts their thoughts by userId",
+            notes = "Let them hear you!",
+            response = Posts.class)
+    public ResponseEntity<Posts> makeAPost(@RequestBody PostDto postDto, @PathVariable(name = "userId") long id ){
+
         Posts posts1 = postService.addPost(postDto.getPost(), postDto.getTitle(), id);
         return new ResponseEntity<>(posts1, HttpStatus.CREATED);
     }
@@ -65,6 +72,19 @@ public class PostController {
     public ResponseEntity<Comments> addCommentToPost(@Valid @PathVariable(name = "id") long postId, @PathVariable(name = "userId") long userId, @RequestBody CommentRequest comment){
         Comments comments = commentService.addCommentToPost(comment, postId, userId);
         return new ResponseEntity<>(comments, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{id}/{postId}/{userId}")
+    public ResponseEntity<Comments> updateUserComment(@PathVariable(name = "id") long id, @RequestBody CommentRequest comment){
+        Comments comments = commentService.findCommentById(id);
+        comments.setBody(comment.getBody());
+        return new ResponseEntity<>(commentService.updateComment(comments), HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<String> deleteUserComment(@PathVariable(name = "id") long id){
+        commentService.deleteComment(id);
+        return new ResponseEntity<>("This comment has been deleted", HttpStatus.ACCEPTED);
     }
     }
 

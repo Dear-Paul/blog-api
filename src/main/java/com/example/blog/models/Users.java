@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "users")
+
 public class Users extends DateAudit{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,8 +43,23 @@ public class Users extends DateAudit{
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
+    public Users(Long id, String password, String email) {
+        this.id = id;
+        this.password = password;
+        this.email = email;
+    }
 
+    public Users() {
 
+    }
 
-
+    public Users(Long id, String firstName, String lastName, String userName, String password, String phoneNumber, String email) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userName = userName;
+        this.password = password;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+    }
 }

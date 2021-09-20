@@ -1,5 +1,6 @@
 package com.example.blog.servicesImpl;
 
+import com.example.blog.exceptions.NoContentFoundException;
 import com.example.blog.models.Favourites;
 import com.example.blog.models.Posts;
 import com.example.blog.models.Users;
@@ -32,11 +33,13 @@ public class FavouritesServiceImpl implements FavouritesServices {
 
 
     @Override
-    public List<Favourites> getAllFavoritesById(long favId) {
+    public List<Favourites> getAllFavoritesById(long userId) {
 
-        Favourites favourites =  favouritesRepository.findAllById(favId);
-        List<Favourites> listOfFavourites = new ArrayList<>();
-        listOfFavourites.add(favourites);
+        Users user = userRepository.getById(userId);
+
+//        Favourites favourites =  favouritesRepository.getById(user);
+        List<Favourites> listOfFavourites = favouritesRepository.getFavouritesByUsers_Id(user.getId());
+
         return listOfFavourites;
     }
 
@@ -64,19 +67,29 @@ public class FavouritesServiceImpl implements FavouritesServices {
 
     @Override
     public void removeFromFavourites(long id, long postId) {
-        Favourites favourites = favouritesRepository.getById(id);
-        List<Posts> listOfFavourites = favourites.getFavPosts();
-        //listOfFavourites.add(favourites);
-        Posts posts = postsRepository.getById(postId);
-        for (Posts post:listOfFavourites) {
-            if(post.equals(posts)){
-                listOfFavourites.remove(posts);
-                favourites.setFavPosts(listOfFavourites);
-                favouritesRepository.save(favourites);
-            }
+       // Favourites favourites = new Favourites();
+        Users user = userRepository.getById(id);
+        Posts userPost = postsRepository.getById(postId);
+        Favourites favourites = favouritesRepository.findFavouritesByUsers(user).get();
 
+        if(userPost==null){
+            throw new NoContentFoundException("Post not found");
+        } else {
+            List<Posts> listOfPost = favourites.getFavPosts();
+
+            for (Posts post : listOfPost) {
+                if (post.equals(userPost)) {
+                    listOfPost.remove(post);
+                    favourites.setFavPosts(listOfPost);
+
+                }
+
+            }
+            favouritesRepository.save(favourites);
         }
 
+        }
     }
-}
+
+
 
