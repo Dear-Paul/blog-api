@@ -1,0 +1,30 @@
+version: '3.1'
+services:
+  app:
+    container_name: testing
+    image: blog:latest
+    ports:
+      - "8080:8080"
+    restart: "no"
+#    build:
+#      dockerfile: Dockerfile
+    depends_on:
+      - postgresDB
+
+  postgresDB:
+    image: postgres
+    ports:
+      - '54332'
+
+    environment:
+      - POSTGRES_PASSWORD=12345@Achiever
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=blog
+    volumes:
+      - data/da
+
+
+
+
+
+
